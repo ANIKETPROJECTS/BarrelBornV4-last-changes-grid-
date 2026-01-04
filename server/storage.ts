@@ -155,7 +155,6 @@ export class MongoStorage implements IStorage {
       'sizzlers': 'sizzlers',
       'pizza': 'pizza',
       'rice-noodles': 'rice-noodles',
-      'oriental-starters': 'oriental-starters',
     };
 
     this.categories.forEach(category => {
