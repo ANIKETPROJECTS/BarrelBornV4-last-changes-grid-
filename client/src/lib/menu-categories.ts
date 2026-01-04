@@ -43,7 +43,7 @@ export const foodSubcategories: SubCategory[] = [
   { id: "sizzlers", displayLabel: "Sizzlers", dbCategory: "sizzlers" },
   { id: "sliders", displayLabel: "Sliders", dbCategory: "sliders" },
   { id: "pizza", displayLabel: "Pizza", dbCategory: "pizza" },
-  { id: "rice-noodles", displayLabel: "Rice & Noodles", dbCategory: "rice-&-noodles" },
+  { id: "rice-noodles", displayLabel: "Rice & Noodles", dbCategory: "rice-noodles" },
 ];
 
 // BAR subcategories - Whiskey has sub-subcategories, Wine has sub-subcategories
