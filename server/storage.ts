@@ -178,9 +178,14 @@ export class MongoStorage implements IStorage {
   }
 
   async getMenuItemsByCategory(category: string): Promise<MenuItem[]> {
+    console.log(`[Storage] Fetching items for category: ${category}`);
     const collection = this.categoryCollections.get(category);
-    if (!collection) return [];
+    if (!collection) {
+      console.log(`[Storage] No collection found for category: ${category}`);
+      return [];
+    }
     const menuItems = await collection.find({}).toArray();
+    console.log(`[Storage] Found ${menuItems.length} items for ${category}`);
     return this.sortMenuItems(menuItems);
   }
 
