@@ -155,6 +155,7 @@ export class MongoStorage implements IStorage {
       'sizzlers': 'sizzlers',
       'pizza': 'pizza',
       'rice-noodles': 'rice-noodles',
+      'oriental-starters': 'oriental-starters',
     };
 
     this.categories.forEach(category => {
@@ -202,21 +203,31 @@ export class MongoStorage implements IStorage {
 
   async getMenuItemsByCategory(category: string): Promise<MenuItem[]> {
     console.log(`[Storage] Fetching items for category: ${category}`);
-    let collection = this.categoryCollections.get(category);
     
-    // Fallback: search for collection by name if not in map
+    // Normalize category name for matching
+    const normalizedCategory = category.toLowerCase().trim();
+    
+    let collection = this.categoryCollections.get(normalizedCategory);
+    
+    // Try to find by direct name if not in mapping
     if (!collection) {
-      console.log(`[Storage] Category ${category} not found in pre-defined map, searching by name...`);
-      collection = this.db.collection(category) as Collection<MenuItem>;
+      console.log(`[Storage] Category ${normalizedCategory} not found in pre-defined map, searching by name...`);
+      collection = this.db.collection(normalizedCategory) as Collection<MenuItem>;
     }
 
     if (!collection) {
-      console.log(`[Storage] No collection found for category: ${category}`);
+      console.log(`[Storage] No collection found for category: ${normalizedCategory}`);
       return [];
     }
-    const menuItems = await collection.find({}).toArray();
-    console.log(`[Storage] Found ${menuItems.length} items for ${category}`);
-    return this.sortMenuItems(menuItems);
+    
+    try {
+      const menuItems = await collection.find({}).toArray();
+      console.log(`[Storage] Found ${menuItems.length} items for ${normalizedCategory}`);
+      return this.sortMenuItems(menuItems);
+    } catch (error) {
+      console.error(`[Storage] Error fetching items for ${normalizedCategory}:`, error);
+      return [];
+    }
   }
 
   async getMenuItem(id: string): Promise<MenuItem | undefined> {
