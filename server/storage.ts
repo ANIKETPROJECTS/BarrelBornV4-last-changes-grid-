@@ -206,23 +206,37 @@ export class MongoStorage implements IStorage {
     // Normalize category name for matching
     const normalizedCategory = category.toLowerCase().trim();
     
-    let collection = this.categoryCollections.get(normalizedCategory);
+    // Check our explicit mapping first
+    const mappedCollectionName = this.categoryCollections.get(normalizedCategory);
+    let collection: Collection<MenuItem>;
     
-    // Try to find by direct name if not in mapping
-    if (!collection) {
+    if (mappedCollectionName) {
+      collection = mappedCollectionName;
+    } else {
       console.log(`[Storage] Category ${normalizedCategory} not found in pre-defined map, searching by name...`);
       collection = this.db.collection(normalizedCategory) as Collection<MenuItem>;
     }
 
-    if (!collection) {
-      console.log(`[Storage] No collection found for category: ${normalizedCategory}`);
-      return [];
-    }
-    
     try {
-      const menuItems = await collection.find({}).toArray();
-      console.log(`[Storage] Found ${menuItems.length} items for ${normalizedCategory}`);
-      return this.sortMenuItems(menuItems);
+      // First try searching across ALL collections for items with this category field
+      // This is most reliable when items are misplaced in different collections
+      console.log(`[Storage] Searching across all collections for category: ${normalizedCategory}...`);
+      const allItems = await this.getMenuItems();
+      const menuItems = allItems.filter(item => 
+        item.category && item.category.toLowerCase().trim() === normalizedCategory
+      );
+      
+      if (menuItems.length > 0) {
+        console.log(`[Storage] Found ${menuItems.length} items for ${normalizedCategory} by scanning all items`);
+        return this.sortMenuItems(menuItems);
+      }
+
+      // If scanning all items failed (e.g. they don't have the category field set correctly),
+      // fall back to checking the specific collection
+      console.log(`[Storage] No items found by scan, checking collection ${normalizedCategory}...`);
+      const collectionItems = await collection.find({}).toArray();
+      console.log(`[Storage] Found ${collectionItems.length} items in collection ${normalizedCategory}`);
+      return this.sortMenuItems(collectionItems);
     } catch (error) {
       console.error(`[Storage] Error fetching items for ${normalizedCategory}:`, error);
       return [];
