@@ -119,7 +119,8 @@ export class MongoStorage implements IStorage {
       'mini-burger-sliders': 'mini-burger-sliders',
       'entree-(main-course)': 'entree-(main-course)',
       'bao-&-dim-sum': 'bao-&-dim-sum',
-      'indian-mains---curries': 'indian-mains---curries',
+      'indian-mains-curries': 'indian-mains-curries',
+      'indian-mains---curries': 'indian-mains-curries',
       'biryanis-&-rice': 'biryanis-&-rice',
       'dals': 'dals',
       'breads': 'breads',
@@ -215,7 +216,14 @@ export class MongoStorage implements IStorage {
 
   async getMenuItemsByCategory(category: string): Promise<MenuItem[]> {
     console.log(`[Storage] Fetching items for category: ${category}`);
-    const collection = this.categoryCollections.get(category);
+    let collection = this.categoryCollections.get(category);
+    
+    // Fallback: search for collection by name if not in map
+    if (!collection) {
+      console.log(`[Storage] Category ${category} not found in pre-defined map, searching by name...`);
+      collection = this.db.collection(category) as Collection<MenuItem>;
+    }
+
     if (!collection) {
       console.log(`[Storage] No collection found for category: ${category}`);
       return [];
