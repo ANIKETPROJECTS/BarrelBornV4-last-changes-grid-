@@ -36,7 +36,14 @@ export const foodSubcategories: SubCategory[] = [
   { id: "breads", displayLabel: "Breads", dbCategory: "breads" },
   { id: "asian-mains", displayLabel: "Asian Mains", dbCategory: "asian-mains" },
   { id: "rice-with-curry---thai-asian-bowls", displayLabel: "Rice with Curry - Thai & Asian Bowls", dbCategory: "rice-with-curry---thai-asian-bowls" },
-  { id: "rice-noodles", displayLabel: "Rice & Noodles", dbCategory: "rice-noodles" },
+  { id: "thai-bowls", displayLabel: "Thai Bowls", dbCategory: "thai-bowls" },
+  { id: "starters", displayLabel: "Starters", dbCategory: "starters" },
+  { id: "tandoor-starters", displayLabel: "Tandoor Starters", dbCategory: "tandoor-starters" },
+  { id: "oriental-starters", displayLabel: "Oriental Starters", dbCategory: "oriental-starters" },
+  { id: "sizzlers", displayLabel: "Sizzlers", dbCategory: "sizzlers" },
+  { id: "sliders", displayLabel: "Sliders", dbCategory: "sliders" },
+  { id: "pizza", displayLabel: "Pizza", dbCategory: "pizza" },
+  { id: "rice-noodles", displayLabel: "Rice & Noodles", dbCategory: "rice-&-noodles" },
 ];
 
 // BAR subcategories - Whiskey has sub-subcategories, Wine has sub-subcategories

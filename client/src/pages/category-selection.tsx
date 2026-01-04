@@ -180,7 +180,7 @@ export default function CategorySelection() {
       const itemCategory = item.category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
       
       const isCorrectCategory = categoryId === "food" 
-        ? ["nibbles", "titbits", "soups", "salads", "starters", "charcoal", "pasta", "pizza", "sliders", "entree", "bao-dimsum", "curries", "biryani", "rice", "dals", "breads", "asian-mains", "thai-bowls", "rice-noodles", "sizzlers", "desserts"].includes(itemCategory)
+        ? ["nibbles", "titbits", "soups", "salads", "starters", "charcoal", "pasta", "pizza", "sliders", "entree", "bao-dimsum", "curries", "biryani", "rice", "dals", "breads", "asian-mains", "thai-bowls", "rice-noodles", "sizzlers", "desserts", "tandoor-starters", "oriental-starters", "rice-with-curry---thai-asian-bowls", "biryanis-rice", "rice-&-noodles"].includes(itemCategory)
         : ["blended-whisky", "blended-scotch-whisky", "american-irish-whiskey", "single-malt-whisky", "vodka", "gin", "rum", "tequila", "cognac-brandy", "liqueurs", "sparkling-wine", "white-wines", "rose-wines", "red-wines", "dessert-wines", "port-wine", "signature-mocktails", "soft-beverages"].includes(itemCategory);
       
       const matchesSearch = item.name.toLowerCase().includes(query) || 

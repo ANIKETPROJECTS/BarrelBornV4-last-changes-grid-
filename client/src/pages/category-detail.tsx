@@ -97,6 +97,7 @@ const subcategoryImages: Record<string, string> = {
   "asian-mains": asianMainsImg,
   "thai-bowls": thaiBowlsImg,
   "rice-noodles": riceNoodlesImg,
+  "rice-&-noodles": riceNoodlesImg,
   sizzlers: sizzlersImg,
   "blended-whisky": blendedWhiskyImg,
   "blended-scotch-whisky": blendedScotchWhiskyImg,
