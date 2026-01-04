@@ -218,6 +218,14 @@ export class MongoStorage implements IStorage {
     }
 
     try {
+      // Step 0: Check the direct collection first (fastest)
+      console.log(`[Storage] Checking direct collection: ${normalizedCategory}...`);
+      const directItems = await collection.find({}).toArray();
+      if (directItems.length > 0) {
+        console.log(`[Storage] Found ${directItems.length} items in collection ${normalizedCategory}`);
+        return this.sortMenuItems(directItems);
+      }
+
       // Step 1: Search across ALL collections for items with this category field
       // This is most reliable when items are misplaced in different collections
       console.log(`[Storage] Searching across all collections for category: ${normalizedCategory}...`);
