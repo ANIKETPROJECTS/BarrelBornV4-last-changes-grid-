@@ -82,22 +82,15 @@ export class MongoStorage implements IStorage {
     "bao-dimsum",
     "entree",
     "rice-with-curry---thai-asian-bowls",
-    "thai-bowls",
-    "starters",
-    "tandoor-starters",
     "oriental-starters",
     "sizzlers",
     "pizza",
     "rice-noodles",
-    "main-course-continental",
-    "biryani",
-    "rice",
     "gin",
     "rum",
     "vodka",
     "tequila",
     "liqueurs",
-    "sheet1"
   ];
 
   constructor(connectionString: string) {
@@ -158,17 +151,10 @@ export class MongoStorage implements IStorage {
       'bao-dimsum': 'bao-dimsum',
       'entree': 'entree',
       'rice-with-curry---thai-asian-bowls': 'rice-with-curry---thai-asian-bowls',
-      'thai-bowls': 'thai-bowls',
-      'starters': 'starters',
-      'tandoor-starters': 'tandoor-starters',
       'oriental-starters': 'oriental-starters',
       'sizzlers': 'sizzlers',
       'pizza': 'pizza',
       'rice-noodles': 'rice-noodles',
-      'main-course-continental': 'main-course-continental',
-      'biryani': 'biryani',
-      'rice': 'rice',
-      'sheet1': 'sheet1'
     };
 
     this.categories.forEach(category => {
