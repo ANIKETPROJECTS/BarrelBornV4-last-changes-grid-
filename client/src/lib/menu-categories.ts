@@ -41,7 +41,6 @@ export const foodSubcategories: SubCategory[] = [
   { id: "tandoor-starters", displayLabel: "Tandoor Starters", dbCategory: "tandoor-starters" },
   { id: "oriental-starters", displayLabel: "Oriental Starters", dbCategory: "oriental-starters" },
   { id: "sizzlers", displayLabel: "Sizzlers", dbCategory: "sizzlers" },
-  { id: "sliders", displayLabel: "Sliders", dbCategory: "sliders" },
   { id: "pizza", displayLabel: "Pizza", dbCategory: "pizza" },
   { id: "rice-noodles", displayLabel: "Rice & Noodles", dbCategory: "rice-noodles" },
 ];

@@ -32,7 +32,7 @@ interface BarItem {
   price: number | string;
 }
 
-async function migrateBarPrices() {
+export async function migrateBarPrices() {
   const mongoUri = process.env.MONGODB_URI;
   if (!mongoUri) {
     throw new Error("MONGODB_URI environment variable not set");
