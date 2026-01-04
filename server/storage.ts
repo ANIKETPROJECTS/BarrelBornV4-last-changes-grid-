@@ -207,7 +207,9 @@ export class MongoStorage implements IStorage {
     const normalizedCategory = category.toLowerCase().trim();
     
     // Check our explicit mapping first
-    const mappedCollectionName = this.categoryCollections.get(normalizedCategory);
+    const mappedCollectionName = Array.from(this.categoryCollections.entries())
+      .find(([key]) => key.toLowerCase().trim() === normalizedCategory)?.[1];
+    
     let collection: Collection<MenuItem>;
     
     if (mappedCollectionName) {
@@ -222,8 +224,6 @@ export class MongoStorage implements IStorage {
       console.log(`[Storage] Checking direct collection: ${normalizedCategory}...`);
       const directItems = await collection.find({}).toArray();
       
-      // Filter out items that might belong to other categories if the collection is mixed
-      // but if the collection name matches the requested category, we should trust it
       if (directItems.length > 0) {
         console.log(`[Storage] Found ${directItems.length} items in collection ${normalizedCategory}`);
         
@@ -236,41 +236,43 @@ export class MongoStorage implements IStorage {
         return this.sortMenuItems(itemsWithCategory);
       }
 
+      // Step 0.1: Try a fallback for common variations
+      if (normalizedCategory === 'pizza') {
+        console.log(`[Storage] Trying fallback collection 'artisan-pizzas' for 'pizza'...`);
+        const pizzaColl = this.db.collection('artisan-pizzas') as Collection<MenuItem>;
+        const pizzaItems = await pizzaColl.find({}).toArray();
+        if (pizzaItems.length > 0) {
+          console.log(`[Storage] Found ${pizzaItems.length} items in 'artisan-pizzas'`);
+          return this.sortMenuItems(pizzaItems.map(item => ({ ...item, category: 'pizza' })));
+        }
+      }
+
       // Step 1: Search across ALL collections for items with this category field
-      // This is most reliable when items are misplaced in different collections
       console.log(`[Storage] Searching across all collections for category: ${normalizedCategory}...`);
-      const allItems = await this.getMenuItems();
       
-      // We match against both the normalized category and "wok" if looking for oriental-starters
-      const menuItems = allItems.filter(item => {
-        if (!item.category) return false;
-        const itemCat = item.category.toLowerCase().trim();
-        if (normalizedCategory === 'oriental-starters') {
-          return itemCat === 'oriental-starters' || itemCat === 'wok';
-        }
-        return itemCat === normalizedCategory;
-      });
+      // Get all collection names from the database
+      const dbCollections = await this.db.listCollections().toArray();
+      const allMenuItems: MenuItem[] = [];
       
-      if (menuItems.length > 0) {
-        console.log(`[Storage] Found ${menuItems.length} items for ${normalizedCategory} by scanning all items`);
-        return this.sortMenuItems(menuItems);
-      }
-
-      // Step 2: Fallback to the specific collection if scan returned nothing
-      // Also check the 'wok' collection specifically for oriental-starters
-      if (normalizedCategory === 'oriental-starters') {
-        const wokCollection = this.db.collection('wok') as Collection<MenuItem>;
-        const wokItems = await wokCollection.find({}).toArray();
-        if (wokItems.length > 0) {
-          console.log(`[Storage] Found ${wokItems.length} items in 'wok' collection as fallback for oriental-starters`);
-          return this.sortMenuItems(wokItems);
+      for (const collInfo of dbCollections) {
+        const coll = this.db.collection(collInfo.name) as Collection<MenuItem>;
+        // Case-insensitive search for category field
+        const items = await coll.find({ 
+          category: { $regex: new RegExp(`^${normalizedCategory}$`, 'i') } 
+        }).toArray();
+        
+        if (items.length > 0) {
+          console.log(`[Storage] Found ${items.length} items in collection ${collInfo.name} for category ${normalizedCategory}`);
+          allMenuItems.push(...items);
         }
       }
 
-      console.log(`[Storage] No items found by scan, checking collection ${normalizedCategory}...`);
-      const collectionItems = await collection.find({}).toArray();
-      console.log(`[Storage] Found ${collectionItems.length} items in collection ${normalizedCategory}`);
-      return this.sortMenuItems(collectionItems);
+      if (allMenuItems.length > 0) {
+        console.log(`[Storage] Total found ${allMenuItems.length} items for ${normalizedCategory}`);
+        return this.sortMenuItems(allMenuItems);
+      }
+
+      return [];
     } catch (error) {
       console.error(`[Storage] Error fetching items for ${normalizedCategory}:`, error);
       return [];
