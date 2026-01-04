@@ -218,21 +218,37 @@ export class MongoStorage implements IStorage {
     }
 
     try {
-      // First try searching across ALL collections for items with this category field
+      // Step 1: Search across ALL collections for items with this category field
       // This is most reliable when items are misplaced in different collections
       console.log(`[Storage] Searching across all collections for category: ${normalizedCategory}...`);
       const allItems = await this.getMenuItems();
-      const menuItems = allItems.filter(item => 
-        item.category && item.category.toLowerCase().trim() === normalizedCategory
-      );
+      
+      // We match against both the normalized category and "wok" if looking for oriental-starters
+      const menuItems = allItems.filter(item => {
+        if (!item.category) return false;
+        const itemCat = item.category.toLowerCase().trim();
+        if (normalizedCategory === 'oriental-starters') {
+          return itemCat === 'oriental-starters' || itemCat === 'wok';
+        }
+        return itemCat === normalizedCategory;
+      });
       
       if (menuItems.length > 0) {
         console.log(`[Storage] Found ${menuItems.length} items for ${normalizedCategory} by scanning all items`);
         return this.sortMenuItems(menuItems);
       }
 
-      // If scanning all items failed (e.g. they don't have the category field set correctly),
-      // fall back to checking the specific collection
+      // Step 2: Fallback to the specific collection if scan returned nothing
+      // Also check the 'wok' collection specifically for oriental-starters
+      if (normalizedCategory === 'oriental-starters') {
+        const wokCollection = this.db.collection('wok') as Collection<MenuItem>;
+        const wokItems = await wokCollection.find({}).toArray();
+        if (wokItems.length > 0) {
+          console.log(`[Storage] Found ${wokItems.length} items in 'wok' collection as fallback for oriental-starters`);
+          return this.sortMenuItems(wokItems);
+        }
+      }
+
       console.log(`[Storage] No items found by scan, checking collection ${normalizedCategory}...`);
       const collectionItems = await collection.find({}).toArray();
       console.log(`[Storage] Found ${collectionItems.length} items in collection ${normalizedCategory}`);
